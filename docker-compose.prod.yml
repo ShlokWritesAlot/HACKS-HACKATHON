@@ -1,0 +1,118 @@
+version: '3.8'
+
+networks:
+  bhasha-public-net:
+    driver: bridge
+  bhasha-internal-net:
+    internal: true
+    driver: bridge
+
+volumes:
+  pgdata:
+  redisdata:
+
+services:
+  # ── PostgreSQL + pgvector ───────────────────────────────────────────────────
+  db:
+    image: pgvector/pgvector:pg16
+    restart: always
+    environment:
+      POSTGRES_DB: bhasharakshak
+      POSTGRES_USER: bhasha_prod_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    networks:
+      - bhasha-internal-net
+    # Port 5432 is NOT published externally
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2048M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bhasha_prod_user -d bhasharakshak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis (Rate limiting & Session cache) ───────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --requirepass_file /run/secrets/redis_password
+    networks:
+      - bhasha-internal-net
+    # Port 6379 is NOT published externally
+    volumes:
+      - redisdata:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── FastAPI Backend Service ─────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    restart: always
+    environment:
+      ENVIRONMENT: production
+      DEBUG: "False"
+      DATABASE_URL: postgresql://bhasha_prod_user:prod_password@db:5432/bhasharakshak
+      REDIS_URL: redis://redis:6379/0
+      ANALYST_SECRET_KEY: ${ANALYST_SECRET_KEY}
+    networks:
+      - bhasha-internal-net
+      - bhasha-public-net
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2048M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ── Next.js Frontend Service ────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://backend:8000
+    networks:
+      - bhasha-public-net
+    ports:
+      - "80:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3

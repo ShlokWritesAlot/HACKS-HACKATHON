@@ -1,0 +1,1 @@
+"""BhashaRakshak backend package."""

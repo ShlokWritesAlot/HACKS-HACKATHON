@@ -1,0 +1,22 @@
+# docker-compose.override.yml
+# This file is automatically merged with docker-compose.yml for local development.
+# Do NOT commit secrets here. Use .env for secrets.
+# Add volume mounts for hot-reload in development.
+
+services:
+  backend:
+    volumes:
+      - ./backend:/app
+      - /app/.venv  # preserve the virtualenv inside the container
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --log-level info
+    environment:
+      ENVIRONMENT: development
+
+  frontend:
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules   # preserve node_modules inside container
+      - /app/.next          # preserve .next build cache
+    command: npm run dev
+    environment:
+      NODE_ENV: development

@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    /* ── Language / Target ─────────────────────────────────────────────────── */
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+
+    /* ── Strict Mode (all strict flags enabled) ────────────────────────────── */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": true,
+    "useUnknownInCatchVariables": true,
+
+    /* ── Module resolution ─────────────────────────────────────────────────── */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "resolveJsonModule": true,
+    "allowJs": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* ── Output ────────────────────────────────────────────────────────────── */
+    "noEmit": true,
+    "incremental": true,
+
+    /* ── Quality ───────────────────────────────────────────────────────────── */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* ── Next.js specific ──────────────────────────────────────────────────── */
+    "plugins": [{ "name": "next" }],
+    "isolatedModules": true
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,29 @@
+# =============================================================================
+# BhashaRakshak Backend – Pinned Dependencies
+# Generated for Python 3.11
+# =============================================================================
+
+# ── Web Framework ─────────────────────────────────────────────────────────────
+fastapi==0.111.1
+uvicorn[standard]==0.30.1
+starlette==0.37.2
+
+# ── Pydantic / Settings ───────────────────────────────────────────────────────
+pydantic==2.7.4
+pydantic-settings==2.3.4
+pydantic-core==2.18.4
+
+# ── Database ──────────────────────────────────────────────────────────────────
+sqlalchemy==2.0.31
+asyncpg==0.29.0
+alembic==1.13.2
+
+# ── HTTP client (for health checks, NOT for visiting user-supplied URLs) ──────
+httpx==0.27.0
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+python-json-logger==2.0.7
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+python-multipart==0.0.9
+anyio==4.4.0
