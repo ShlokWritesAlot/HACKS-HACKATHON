@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   // Strict React mode — catches common bugs early
   reactStrictMode: true,
 
@@ -39,10 +38,7 @@ const nextConfig: NextConfig = {
   },
 
   // Experimental features
-  experimental: {
-    // Enforce that only NEXT_PUBLIC_ env vars are exposed to browser
-    // (this is Next.js default behaviour; documented here for clarity)
-  },
+  experimental: {},
 };
 
 export default nextConfig;
